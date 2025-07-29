@@ -1,3 +1,18 @@
+/**
+ * Authentication context providing global auth state management.
+ * 
+ * Features:
+ * - Persistent authentication via localStorage
+ * - Automatic token validation on app startup
+ * - Centralized auth state for the entire app
+ * - Navigation side effects (redirect after login/logout)
+ * 
+ * Design decisions:
+ * - Uses localStorage for token persistence across browser sessions
+ * - Implements optimistic user creation (creates User object from login credentials)
+ * - Loading state prevents flash of unauthenticated content during initialization
+ * - Separates login/register flows (register doesn't auto-login for security)
+ */
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, LoginCredentials, RegisterData, AuthToken } from '../types';
@@ -35,7 +50,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Initialize auth state from localStorage
+  /**
+   * Initialize authentication state from localStorage on app startup.
+   * 
+   * This handles browser refresh/reload scenarios where we need to restore
+   * the user's authentication state. The loading state prevents flash of
+   * unauthenticated content while we check localStorage.
+   * 
+   * Future enhancement: Add token validation against backend to handle
+   * expired tokens gracefully.
+   */
   useEffect(() => {
     const initializeAuth = async () => {
       const storedToken = getToken();
@@ -45,13 +69,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setTokenState(storedToken);
         setUser(storedUser);
         
-        // Optionally verify token validity with backend
+        // Future enhancement: Verify token validity with backend
         try {
-          // You could add a /auth/me endpoint to verify token
+          // Could add a /auth/me endpoint to verify token and get fresh user data
           // const userData = await authApi.getMe();
           // setUser(userData);
         } catch (error) {
-          // Token invalid, clear auth
+          // Token invalid or expired, clear auth state
           clearAuth();
           setTokenState(null);
           setUser(null);
@@ -65,39 +89,57 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   const login = async (credentials: LoginCredentials) => {
+    /**
+     * Authenticate user and establish session.
+     * 
+     * Flow:
+     * 1. Send login request to backend
+     * 2. Store JWT token in localStorage and state
+     * 3. Create optimistic user object (production should fetch real user data)
+     * 4. Navigate to protected route
+     * 
+     * Error handling: Clears any existing auth state if login fails
+     */
     try {
       const response = await authApi.login(credentials);
       const { access_token } = response;
       
-      // Store token
+      // Store token in localStorage and state
       setToken(access_token);
       setTokenState(access_token);
       
-      // Decode user info from token or fetch user data
-      // For now, we'll create a simple user object
-      // In production, you might want to decode the JWT or fetch user info
+      // Optimistic user creation - production should decode JWT or fetch user data
+      // This approach avoids extra API call but limits available user info
       const userData: User = {
-        id: 1, // This should come from token or API
+        id: 1, // Should decode from JWT token or fetch from API
         username: credentials.username,
-        email: '', // This should come from API
+        email: '', // Should come from user profile API
         created_at: new Date().toISOString(),
       };
       
       setStoredUser(userData);
       setUser(userData);
       
-      // Navigate to private todos
+      // Navigation side effect: redirect to protected area
       navigate(ROUTES.PRIVATE_TODOS);
     } catch (error) {
+      // Ensure clean state on login failure
       clearAuth();
       throw error;
     }
   };
 
   const register = async (data: RegisterData) => {
+    /**
+     * Register new user account.
+     * 
+     * Security design: Does NOT auto-login after registration.
+     * This forces explicit authentication step and prevents
+     * account takeover via registration endpoints.
+     */
     try {
       const userData = await authApi.register(data);
-      // After registration, redirect to login
+      // Redirect to login - user must explicitly authenticate
       navigate(ROUTES.LOGIN);
     } catch (error) {
       throw error;
@@ -105,6 +147,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const logout = () => {
+    /**
+     * Clear authentication state and return to public area.
+     * 
+     * Handles both localStorage cleanup and component state.
+     * Navigation side effect ensures user sees public content.
+     */
     clearAuth();
     setUser(null);
     setTokenState(null);

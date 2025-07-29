@@ -1,3 +1,15 @@
+"""
+Private todo endpoints with strict ownership validation.
+
+Security model:
+- All endpoints require JWT authentication via get_current_user dependency
+- Users can only access/modify todos they own (todo.user_id == current_user.id)
+- Supports both private (is_public=False) and public (is_public=True) todos
+- Public todos created here are visible in public endpoints but ownership is maintained
+
+Ownership validation ensures users cannot access or modify other users' todos,
+even if they know the todo ID.
+"""
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
@@ -15,7 +27,14 @@ async def get_user_todos(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    # Get both private and public todos created by the user
+    """
+    Get all todos owned by the authenticated user.
+    
+    Returns both private and public todos created by the user.
+    Other users' todos are never included, ensuring data isolation.
+    Supports pagination via skip/limit parameters.
+    """
+    # Ownership filter: only todos belonging to current user
     todos = db.query(Todo).filter(
         Todo.user_id == current_user.id
     ).offset(skip).limit(limit).all()
@@ -44,12 +63,20 @@ async def get_todo(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    """
+    Get a specific todo by ID, with ownership validation.
+    
+    Critical security: Uses compound filter (id AND user_id) to prevent
+    users from accessing other users' todos even if they know the ID.
+    Returns 404 for both non-existent todos and unauthorized access.
+    """
     todo = db.query(Todo).filter(
         Todo.id == todo_id,
-        Todo.user_id == current_user.id
+        Todo.user_id == current_user.id  # Ownership validation
     ).first()
     
     if todo is None:
+        # Don't distinguish between "doesn't exist" and "not authorized" for security
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Todo not found"
@@ -63,9 +90,16 @@ async def update_todo(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    """
+    Update a todo with ownership validation.
+    
+    Uses partial update pattern: only fields provided in todo_update are modified.
+    The exclude_unset=True ensures None values don't overwrite existing data.
+    All the same security principles as get_todo apply here.
+    """
     todo = db.query(Todo).filter(
         Todo.id == todo_id,
-        Todo.user_id == current_user.id
+        Todo.user_id == current_user.id  # Ownership validation
     ).first()
     
     if todo is None:
@@ -74,6 +108,7 @@ async def update_todo(
             detail="Todo not found"
         )
     
+    # Partial update: only modify provided fields
     update_data = todo_update.dict(exclude_unset=True)
     for field, value in update_data.items():
         setattr(todo, field, value)
@@ -88,9 +123,16 @@ async def delete_todo(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    """
+    Delete a todo with ownership validation.
+    
+    Returns 204 No Content on successful deletion per REST conventions.
+    Same ownership validation as other endpoints prevents unauthorized deletion.
+    Note: If this was a public todo, it will also be removed from public view.
+    """
     todo = db.query(Todo).filter(
         Todo.id == todo_id,
-        Todo.user_id == current_user.id
+        Todo.user_id == current_user.id  # Ownership validation
     ).first()
     
     if todo is None:
