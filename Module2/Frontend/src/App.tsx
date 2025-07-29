@@ -6,6 +6,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 
 // Providers and config
 import { AuthProvider } from './contexts/AuthContext';
+import { NotificationProvider } from './contexts/NotificationContext';
 import { theme } from './theme/theme';
 import { queryClient } from './utils/queryClient';
 
@@ -30,8 +31,9 @@ function App() {
         <CssBaseline />
         <BrowserRouter>
           <AuthProvider>
-            <Layout>
-              <Routes>
+            <NotificationProvider>
+              <Layout>
+                <Routes>
                 {/* Public Routes */}
                 <Route path={ROUTES.HOME} element={<Home />} />
                 <Route path={ROUTES.LOGIN} element={<Login />} />
@@ -50,8 +52,9 @@ function App() {
                 
                 {/* Fallback */}
                 <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
-              </Routes>
-            </Layout>
+                </Routes>
+              </Layout>
+            </NotificationProvider>
           </AuthProvider>
         </BrowserRouter>
       </ThemeProvider>

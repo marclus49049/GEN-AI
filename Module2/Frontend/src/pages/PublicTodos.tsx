@@ -6,6 +6,7 @@ import {
   Container,
   Alert,
   Fab,
+  Paper,
 } from '@mui/material';
 import { Add } from '@mui/icons-material';
 import { TodoList } from '../components/todos/TodoList';
@@ -20,11 +21,16 @@ import {
 } from '../hooks/useTodos';
 import { PublicTodo, PublicTodoDto, UpdateTodoDto } from '../types';
 import { getErrorMessage } from '../utils/errorHandler';
+import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '../utils/constants';
 
 export const PublicTodos: React.FC = () => {
   const [formOpen, setFormOpen] = useState(false);
   const [editingTodo, setEditingTodo] = useState<PublicTodo | null>(null);
   const [error, setError] = useState('');
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   const { data: todos = [], isLoading, error: fetchError } = usePublicTodos();
   const createMutation = useCreatePublicTodo();
@@ -92,7 +98,7 @@ export const PublicTodos: React.FC = () => {
           Public Todos
         </Typography>
         <Typography variant="body1" color="text.secondary" paragraph>
-          These todos are visible to everyone. No login required!
+          These todos are visible to everyone. Login required to create new todos.
         </Typography>
 
         {error && (
@@ -101,27 +107,53 @@ export const PublicTodos: React.FC = () => {
           </Alert>
         )}
 
+        {!isAuthenticated && (
+          <Paper sx={{ p: 3, mb: 3, textAlign: 'center' }}>
+            <Typography variant="h6" gutterBottom>
+              Want to create a public todo?
+            </Typography>
+            <Typography variant="body2" color="text.secondary" paragraph>
+              Login to create and manage your own public todos that others can collaborate on.
+            </Typography>
+            <Button 
+              variant="contained" 
+              onClick={() => navigate(ROUTES.LOGIN)}
+              sx={{ mr: 1 }}
+            >
+              Login
+            </Button>
+            <Button 
+              variant="outlined" 
+              onClick={() => navigate(ROUTES.REGISTER)}
+            >
+              Register
+            </Button>
+          </Paper>
+        )}
+
         <TodoList
           todos={todos}
-          onToggle={handleToggle}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
+          onToggle={isAuthenticated ? handleToggle : undefined}
+          onEdit={isAuthenticated ? handleEdit : undefined}
+          onDelete={isAuthenticated ? handleDelete : undefined}
           emptyMessage="No public todos yet. Create the first one!"
         />
       </Box>
 
-      <Fab
-        color="primary"
-        aria-label="add"
-        sx={{
-          position: 'fixed',
-          bottom: 24,
-          right: 24,
-        }}
-        onClick={() => setFormOpen(true)}
-      >
-        <Add />
-      </Fab>
+      {isAuthenticated && (
+        <Fab
+          color="primary"
+          aria-label="add"
+          sx={{
+            position: 'fixed',
+            bottom: 24,
+            right: 24,
+          }}
+          onClick={() => setFormOpen(true)}
+        >
+          <Add />
+        </Fab>
+      )}
 
       <TodoForm
         open={formOpen || !!editingTodo}

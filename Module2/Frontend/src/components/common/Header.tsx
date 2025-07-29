@@ -13,6 +13,7 @@ import {
 import { AccountCircle } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { ROUTES } from '../../utils/constants';
+import { NotificationBell } from '../notifications/NotificationBell';
 
 export const Header: React.FC = () => {
   const { isAuthenticated, user, logout } = useAuth();
@@ -66,6 +67,7 @@ export const Header: React.FC = () => {
               >
                 My Todos
               </Button>
+              <NotificationBell />
               <IconButton
                 size="large"
                 aria-label="account of current user"

@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.endpoints import hello, auth, todos, public
+from app.api.endpoints import hello, auth, todos, public, websocket, notifications
 from app.database import engine, Base
-from app.models import User, Todo
+from app.models import User, Todo, Notification
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -35,6 +35,8 @@ app.add_middleware(
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["authentication"])
 app.include_router(public.router, prefix="/api/v1/public/todos", tags=["public todos"])
 app.include_router(todos.router, prefix="/api/v1/todos", tags=["private todos"])
+app.include_router(notifications.router, prefix="/api/v1/notifications", tags=["notifications"])
+app.include_router(websocket.router, prefix="/ws", tags=["websocket"])
 app.include_router(hello.router, prefix="/api/v1", tags=["hello"])
 
 @app.get("/")
