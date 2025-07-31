@@ -1,14 +1,13 @@
-import React from 'react';
 import {
-  List,
-  Typography,
   Box,
-  Paper,
-  Divider,
   Chip,
+  List,
+  Paper,
+  Typography
 } from '@mui/material';
+import React from 'react';
+import { PublicTodo, Todo } from '../../types';
 import { TodoItem } from './TodoItem';
-import { Todo, PublicTodo } from '../../types';
 
 interface TodoListProps {
   todos: (Todo | PublicTodo)[];

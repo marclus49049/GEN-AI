@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { axiosInstance } from '../api/axiosConfig';
 import { useWebSocket } from '../hooks/useWebSocket';
 import { useAuth } from './AuthContext';
-import { axiosInstance } from '../api/axiosConfig';
 
 interface Notification {
   id: number;
@@ -39,9 +39,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
   
   // WebSocket connection for live notifications
   const { isConnected, lastMessage, sendMessage } = useWebSocket(
-    process.env.NODE_ENV === 'production' 
-      ? 'wss://your-domain.com/ws/notifications'
-      : 'ws://localhost:8000/ws/notifications'
+    'ws://localhost:8000/ws/notifications'
   );
 
   // Fetch notifications from API
@@ -190,7 +188,8 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
       const pingInterval = setInterval(() => {
         sendMessage({
           type: 'ping',
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          data: ""
         });
       }, 30000); // Ping every 30 seconds
 

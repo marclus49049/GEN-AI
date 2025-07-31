@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
 interface WebSocketMessage {
@@ -22,7 +22,7 @@ export const useWebSocket = (url: string): UseWebSocketReturn => {
   const { token, isAuthenticated } = useAuth();
   const reconnectAttempts = useRef(0);
   const maxReconnectAttempts = 5;
-  const reconnectTimeout = useRef<NodeJS.Timeout | null>(null);
+  const reconnectTimeout = useRef<number | null>(null);
 
   const connect = useCallback(() => {
     if (!isAuthenticated || !token) {
@@ -114,13 +114,6 @@ export const useWebSocket = (url: string): UseWebSocketReturn => {
       disconnect();
     };
   }, [isAuthenticated, token, connect, disconnect]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      disconnect();
-    };
-  }, [disconnect]);
 
   return {
     isConnected,

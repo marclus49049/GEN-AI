@@ -1,30 +1,28 @@
-import React, { useState } from 'react';
 import {
-  IconButton,
-  Badge,
-  Popover,
-  Box,
-  Typography,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemAvatar,
-  Avatar,
-  Divider,
-  Button,
-  Chip,
-  Paper,
-} from '@mui/material';
-import {
-  Notifications as NotificationsIcon,
-  NotificationsNone as NotificationsNoneIcon,
-  Person as PersonIcon,
   CheckCircle as CheckCircleIcon,
   Delete as DeleteIcon,
   Edit as EditIcon,
+  Notifications as NotificationsIcon,
+  NotificationsNone as NotificationsNoneIcon
 } from '@mui/icons-material';
-import { useNotifications } from '../../contexts/NotificationContext';
+import {
+  Avatar,
+  Badge,
+  Box,
+  Button,
+  Chip,
+  Divider,
+  IconButton,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  Popover,
+  Typography
+} from '@mui/material';
 import { formatDistanceToNow } from 'date-fns';
+import React, { useState } from 'react';
+import { useNotifications } from '../../contexts/NotificationContext';
 
 const getActionIcon = (actionType: string) => {
   switch (actionType) {

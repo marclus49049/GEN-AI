@@ -1,6 +1,6 @@
-import { axiosInstance } from './axiosConfig';
-import { LoginCredentials, RegisterData, AuthToken, User } from '../types';
+import { AuthToken, LoginCredentials, RegisterData, User } from '../types';
 import { API_ENDPOINTS } from '../utils/constants';
+import { axiosInstance } from './axiosConfig';
 
 export const authApi = {
   login: async (credentials: LoginCredentials): Promise<AuthToken> => {

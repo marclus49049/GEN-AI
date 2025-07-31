@@ -1,6 +1,6 @@
+import { Container } from '@mui/material';
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { Container } from '@mui/material';
 import { LoginForm } from '../components/auth/LoginForm';
 import { useAuth } from '../contexts/AuthContext';
 import { ROUTES } from '../utils/constants';

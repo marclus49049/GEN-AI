@@ -1,16 +1,16 @@
-import React from 'react';
+import { Delete, Edit } from '@mui/icons-material';
 import {
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-  Checkbox,
-  IconButton,
-  Typography,
   Box,
+  Checkbox,
   Chip,
+  IconButton,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Typography,
 } from '@mui/material';
-import { Delete, Edit, Public, Lock } from '@mui/icons-material';
-import { Todo, PublicTodo } from '../../types';
+import React from 'react';
+import { PublicTodo, Todo } from '../../types';
 import { formatDate } from '../../utils/helpers';
 
 interface TodoItemProps {

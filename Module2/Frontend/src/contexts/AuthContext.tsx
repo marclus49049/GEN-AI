@@ -13,12 +13,12 @@
  * - Loading state prevents flash of unauthenticated content during initialization
  * - Separates login/register flows (register doesn't auto-login for security)
  */
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, LoginCredentials, RegisterData, AuthToken } from '../types';
 import { authApi } from '../api/auth';
-import { getToken, setToken, removeToken, getStoredUser, setStoredUser, clearAuth } from '../utils/storage';
+import { LoginCredentials, RegisterData, User } from '../types';
 import { ROUTES } from '../utils/constants';
+import { clearAuth, getStoredUser, getToken, setStoredUser, setToken } from '../utils/storage';
 
 interface AuthContextType {
   user: User | null;

@@ -1,6 +1,6 @@
-import { axiosInstance } from './axiosConfig';
-import { Todo, CreateTodoDto, UpdateTodoDto, PublicTodo, PublicTodoDto, PaginationParams } from '../types';
+import { CreateTodoDto, PaginationParams, PublicTodo, PublicTodoDto, Todo, UpdateTodoDto } from '../types';
 import { API_ENDPOINTS } from '../utils/constants';
+import { axiosInstance } from './axiosConfig';
 
 // Private Todo API
 export const todosApi = {

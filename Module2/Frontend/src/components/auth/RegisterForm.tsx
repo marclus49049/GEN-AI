@@ -1,23 +1,23 @@
-import React, { useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 import {
-  TextField,
-  Button,
-  Box,
-  Typography,
-  Link,
   Alert,
+  Box,
+  Button,
   Card,
   CardContent,
   IconButton,
   InputAdornment,
+  Link,
+  TextField,
+  Typography,
 } from '@mui/material';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { RegisterData } from '../../types';
-import { getErrorMessage } from '../../utils/errorHandler';
 import { ROUTES } from '../../utils/constants';
+import { getErrorMessage } from '../../utils/errorHandler';
 
 interface RegisterFormData extends RegisterData {
   confirmPassword: string;

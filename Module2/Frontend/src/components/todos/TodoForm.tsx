@@ -1,17 +1,17 @@
+import {
+  Box,
+  Button,
+  Checkbox,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControlLabel,
+  TextField,
+} from '@mui/material';
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  TextField,
-  Button,
-  FormControlLabel,
-  Checkbox,
-  Box,
-} from '@mui/material';
-import { Todo, PublicTodo, CreateTodoDto, UpdateTodoDto, PublicTodoDto } from '../../types';
+import { CreateTodoDto, PublicTodo, PublicTodoDto, Todo, UpdateTodoDto } from '../../types';
 
 interface TodoFormProps {
   open: boolean;
